@@ -1,17 +1,29 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+"use client"; 
+
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import Navbar from "./navbar";
+import { TemplatesGallery } from "./templates-gallery";
 
 const Home = () => {
+  const documents = useQuery(api.documents.get);
+
+  if(!documents) {
+    return <div>Loading...</div>
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-white p-4">
         <Navbar />
       </div>
       <div className="pt-16">
-        <Button className="px-8 py-3 text-2xl font-bold rounded-lg">
-        <Link href="/documents/123">Click Me</Link>
-      </Button>
+        <TemplatesGallery />
+        {
+          documents.map((document) => (
+            <span key={document._id}>{document.title}</span>
+          ))
+        }
       </div>
     </div>
   );
