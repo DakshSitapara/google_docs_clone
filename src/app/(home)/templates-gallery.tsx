@@ -1,4 +1,9 @@
-'use client'
+  'use client'
+
+import { useState } from "react";
+import { api } from "../../../convex/_generated/api";
+import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
 
 import {
   Carousel,
@@ -11,7 +16,20 @@ import { cn } from "@/lib/utils";
 import { templates } from "@/constants/templates";
 
 export const TemplatesGallery = () => {
-  const isCreated = false;
+  const router = useRouter();
+  const create = useMutation(api.documents.create);
+  const [isCreated, setIsCreated] =  useState(false);
+
+  const onTemplateClick = (title: string, initialContent: string) =>{
+    setIsCreated(true);
+    create({ title, initialContent }).then((documentId) => {
+      router.push(`/documents/${documentId}`);
+    })
+    .finally(() => {
+      setIsCreated(false);
+    });
+
+  }
 
   return (
     <div className="bg-[#F1F3F4]">
@@ -30,9 +48,7 @@ export const TemplatesGallery = () => {
                     >
                       <button
                         disabled={isCreated}
-                        onClick={() => {
-                          // Handle template selection
-                        }}
+                        onClick={() => onTemplateClick(template.label, "")} // TODO : add proper initial content
                         style={{
                           backgroundImage: `url(${template.imageUrl})`,
                           backgroundSize: "cover",
