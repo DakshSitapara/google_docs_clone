@@ -21,11 +21,6 @@ const Home = () => {
       </div>
       <div className="pt-16">
         <TemplatesGallery />
-        {/* {
-          documents.map((document) => (
-            <span key={document._id}>{document.title}</span>
-          ))
-        } */}
         <DocumentsTable documents={results} loadMore={loadMore} status={status} />
         <div>
 

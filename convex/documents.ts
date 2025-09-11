@@ -9,7 +9,7 @@ export const create = mutation({
     const user = await ctx.auth.getUserIdentity();
     
     if (!user) {
-      throw new ConvexError("unauthenticated");
+      throw new ConvexError("Unauthorized");
   }
   return await ctx.db.insert("documents", {
     title: args.title ?? "Untitled document",
