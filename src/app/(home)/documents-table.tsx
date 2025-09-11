@@ -10,8 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { LoaderIcon } from "lucide-react";
+import { Ghost, LoaderIcon } from "lucide-react";
 import { DocumentRow } from "./document-row";
+import { Button } from "@/components/ui/button";
 
 interface DocumentsTableProps {
     documents: Doc<"documents">[] | undefined;
@@ -56,8 +57,28 @@ export const DocumentsTable = (
 
                 }
           </Table>
-        )
-        }
+        )}
+        <div className="flex justify-center">
+            <Button variant='ghost' 
+            size={"sm"}
+             disabled={status !== "CanLoadMore"}
+              onClick={() => loadMore(5)}
+              >
+              {status === "LoadingMore" ? (
+                <div className="flex items-center gap-1">
+                  <span>Loading...</span>
+                  <LoaderIcon className="animate-spin text-muted-foreground size-5" />
+                </div>
+              ) : status === "CanLoadMore" ? (
+                <div className="flex items-center gap-1">
+                  <span>Load More</span>
+                  <Ghost size={16} />
+                </div>
+              ) : (
+                <span className="text-muted-foreground">End of documents</span>
+              )}
+            </Button>
+        </div>
        </div>
     );
 }
