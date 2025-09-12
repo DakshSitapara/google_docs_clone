@@ -10,9 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Ghost, LoaderIcon } from "lucide-react";
+import { Ghost, LoaderIcon, MoreHorizontal } from "lucide-react";
 import { DocumentRow } from "./document-row";
 import { Button } from "@/components/ui/button";
+import { ImPacman } from "react-icons/im";
+import { FaRegSadTear } from "react-icons/fa";
+
 
 interface DocumentsTableProps {
     documents: Doc<"documents">[] | undefined;
@@ -67,15 +70,19 @@ export const DocumentsTable = (
               {status === "LoadingMore" ? (
                 <div className="flex items-center gap-1">
                   <span>Loading...</span>
-                  <LoaderIcon className="animate-spin text-muted-foreground size-5" />
+                      <ImPacman className="animate-pulse size-5 fill-yellow-500" />
+                  <span className="text-muted-foreground justify-center"><MoreHorizontal className="h-4 w-4" /></span>
                 </div>
               ) : status === "CanLoadMore" ? (
                 <div className="flex items-center gap-1">
                   <span>Load More</span>
-                  <Ghost size={16} />
+                  <Ghost size={16} />                      
                 </div>
               ) : (
+                <div className="flex items-center gap-1">
                 <span className="text-muted-foreground">End of documents</span>
+                <FaRegSadTear className="size-4 text-muted-foreground" />
+                </div>
               )}
             </Button>
         </div>

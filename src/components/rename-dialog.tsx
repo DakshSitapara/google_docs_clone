@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -34,10 +35,13 @@ export const RenameDialog = ({ documentId, initialTitle, children }: RenameDialo
         e.preventDefault();
         setIsUpdating(true);
 
-        update({ id: documentId, title: title.trim() || "Untitled" }).finally(() => {
-            setIsUpdating(false);
-            setOpen(false);
-        });
+        update({ id: documentId, title: title.trim() || "Untitled" })
+            .catch(() => toast.error("Something went wrong"))
+            .then(() => toast.success("Document renamed"))
+            .finally(() => {
+                setIsUpdating(false);
+                setOpen(false);
+            });
     }
     return (
         <Dialog open={open} onOpenChange={setOpen}>
