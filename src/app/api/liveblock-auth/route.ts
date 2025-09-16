@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     if (!sessionClaims) {
         return new Response("Unauthorized", { status: 401 });
     }
+    console.log("sessionClaims", sessionClaims);
 
     const user = await currentUser();
     if (!user) {
@@ -28,10 +29,12 @@ export async function POST(request: Request) {
     }
 
     const isOwner = document.ownerId === user.id;
-    const isOrganizationMember = !! (document.organizationId && document.organizationId === sessionClaims.org_id);
+    const isOrganizationMember = !!(
+    document.organizationId && document.organizationId === sessionClaims.org_id
+    );
 
     if (!isOwner && !isOrganizationMember) {
-        return new Response("Unauthorized", { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
     }
 
     const session  = liveblocks.prepareSession(user.id, {
