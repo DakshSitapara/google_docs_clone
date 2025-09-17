@@ -27,20 +27,28 @@ export async function POST(request: Request) {
         return new Response("Room not found", { status: 404 });
     }
 
-    // const isOwner = document.ownerId === user.id;
-    // const isOrganizationMember = !!(
-    // document.organizationId && document.organizationId === sessionClaims.org_id
-    // );
+    
+    const isOwner = document.ownerId === user.id;
+    const isOrganizationMember = !!(
+        document.organizationId && document.organizationId === sessionClaims.o.id
+    );
 
-    // if (!isOwner && !isOrganizationMember) {
-    // return new Response("Unauthorized", { status: 401 });
-    // }
-    console.log("org_id", sessionClaims.org_id , "user", user.id);
+    // console.log("isOwner", isOwner, "isOrganizationMember", isOrganizationMember);
+    if (!isOwner && !isOrganizationMember) {
+        return new Response("Unauthorized", { status: 401 });
+    }
+    
+    // const organizationId = sessionClaims.organizationId; // Accessing org_id from sessionClaims
+    // console.log("sessionClaims", sessionClaims);
+    // console.log("isOwner", document.ownerId === user.id);
+    // console.log("isOrgMember", document.organizationId , "org_id", sessionClaims.o.id);
+    // console.log("org_id", organizationId , "user", user.id);
+    // console.log("org_id", sessionClaims.org_id , "user", user.id);
 
     const session  = liveblocks.prepareSession(user.id, {
         userInfo: {
-            name: user.fullName ?? "Anonymous",
-            image: user.imageUrl,
+            name: user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Anonymous",
+            avatar: user.imageUrl,
         }
     })
     session.allow(room, session.FULL_ACCESS)
