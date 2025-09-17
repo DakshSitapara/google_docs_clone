@@ -14,7 +14,6 @@ export async function POST(request: Request) {
     if (!sessionClaims) {
         return new Response("Unauthorized", { status: 401 });
     }
-    console.log("sessionClaims", sessionClaims);
 
     const user = await currentUser();
     if (!user) {
@@ -28,14 +27,15 @@ export async function POST(request: Request) {
         return new Response("Room not found", { status: 404 });
     }
 
-    const isOwner = document.ownerId === user.id;
-    const isOrganizationMember = !!(
-    document.organizationId && document.organizationId === sessionClaims.org_id
-    );
+    // const isOwner = document.ownerId === user.id;
+    // const isOrganizationMember = !!(
+    // document.organizationId && document.organizationId === sessionClaims.org_id
+    // );
 
-    if (!isOwner && !isOrganizationMember) {
-    return new Response("Unauthorized", { status: 401 });
-    }
+    // if (!isOwner && !isOrganizationMember) {
+    // return new Response("Unauthorized", { status: 401 });
+    // }
+    console.log("org_id", sessionClaims.org_id , "user", user.id);
 
     const session  = liveblocks.prepareSession(user.id, {
         userInfo: {
