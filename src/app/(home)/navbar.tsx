@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SearchInput } from "./search-input";
 import { UserButton, OrganizationSwitcher } from "@clerk/nextjs";
+import { GithubProfile } from "@/components/github-profle";
 
 export default function Navbar() {
   return (
@@ -21,6 +22,7 @@ export default function Navbar() {
                 afterSelectPersonalUrl="/"
               />
               <UserButton />
+              <GithubProfile />
         </div>
     </nav>
   );
