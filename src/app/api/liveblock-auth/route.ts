@@ -29,15 +29,18 @@ export async function POST(request: Request) {
 
     
     const isOwner = document.ownerId === user.id;
+    const orgId = typeof sessionClaims.o === "object" && sessionClaims.o !== null && "id" in sessionClaims.o
+        ? (sessionClaims.o as { id: string }).id
+        : undefined;
     const isOrganizationMember = !!(
-        document.organizationId && document.organizationId === sessionClaims.o.id
+        document.organizationId && document.organizationId === orgId
     );
 
-    // console.log("isOwner", isOwner, "isOrganizationMember", isOrganizationMember);
     if (!isOwner && !isOrganizationMember) {
         return new Response("Unauthorized", { status: 401 });
     }
     
+    // console.log("isOwner", isOwner, "isOrganizationMember", isOrganizationMember);
     // const organizationId = sessionClaims.organizationId; // Accessing org_id from sessionClaims
     // console.log("sessionClaims", sessionClaims);
     // console.log("isOwner", document.ownerId === user.id);

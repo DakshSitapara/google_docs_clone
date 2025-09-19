@@ -1,4 +1,4 @@
-  'use client'
+"use client";
 
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -59,7 +59,7 @@ export const TemplatesGallery = () => {
                           backgroundRepeat: "no-repeat",
                         }}
                         className="size-full hover:border-blue-500 rounded-sm border hover:bg-blue-50 transition flex flex-col items-center justify-center gap-y-4 bg-white"
-                     / >
+                     />
                       <p className="text-sm font-medium truncate">{template.label}</p>
                     </div>
                 </CarouselItem>
