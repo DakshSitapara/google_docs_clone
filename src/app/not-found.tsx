@@ -2,6 +2,7 @@
 
 import { ArrowLeft, FileQuestion, Home } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '../app/(home)/navbar';
 import { useRouter } from 'next/navigation';
 import SplashCursor from '@/components/SplashCursor';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,9 @@ const NotFoundPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+            <div className="fixed top-0 left-0 right-0 z-10 h-16 bg-black/20 backdrop-blur-md p-4">
+              <Navbar />
+            </div>
       <div className="absolute inset-0 -z-10">
         <Lightning 
           hue={220}
