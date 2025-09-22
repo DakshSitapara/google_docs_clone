@@ -3,7 +3,7 @@
 import { ArrowLeft, FileQuestion, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import SplashCursor from '@/components/SplashCursor';
 import { Button } from '@/components/ui/button';
 import Lightning from '@/components/Lighting';
 
@@ -20,7 +20,7 @@ const NotFoundPage = () => {
           size={2}
         />
       </div>
-
+      <SplashCursor />
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <div className="max-w-xl space-y-6 text-center bg-transparent backdrop-blur-sm p-6 rounded-lg shadow-lg">
           <FileQuestion className="mx-auto size-20 text-blue-500" />
