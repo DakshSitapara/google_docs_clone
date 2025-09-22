@@ -19,11 +19,12 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 interface RemoveDialogProps {
+    title: string;
     documentId : Id<"documents">;
     children: React.ReactNode;
 }
 
-export const RemoveDialog = ({ documentId, children }: RemoveDialogProps) => {
+export const RemoveDialog = ({title, documentId, children }: RemoveDialogProps) => {
     const router = useRouter();
     const remove = useMutation(api.documents.removeById);
     const [isRemoving, setIsRemoving] = useState(false);
@@ -35,7 +36,7 @@ export const RemoveDialog = ({ documentId, children }: RemoveDialogProps) => {
             </AlertDialogTrigger>
             <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure you want to delete this document?</AlertDialogTitle>
+                    <AlertDialogTitle className="justify-between">Are you sure you want to delete <span className="font-bold">{title}</span> document?</AlertDialogTitle>
                     <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete your document.
                     </AlertDialogDescription>

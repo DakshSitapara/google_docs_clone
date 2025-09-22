@@ -33,7 +33,7 @@ export const DocumentMenu = ({ documentId, documentTitle, onNewTab }: DocumentMe
                                 Rename
                             </DropdownMenuItem>
                         </RenameDialog>
-                        <RemoveDialog documentId={documentId}>
+                        <RemoveDialog documentId={documentId} title={documentTitle}>
                             <DropdownMenuItem
                                 onClick={(e) => e.stopPropagation()}
                                 onSelect={(e) => e.preventDefault()}
