@@ -7,6 +7,7 @@ import "./globals.css";
 import "@liveblocks/react-ui/styles.css";
 import "@liveblocks/react-tiptap/styles.css";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ 
   subsets: ["latin"]
@@ -31,6 +32,7 @@ export default function RootLayout({
           <ConvexClientProvider>
             <Toaster />
           {children}
+          <SpeedInsights />
           </ConvexClientProvider>
         </NuqsAdapter>
       </body>
