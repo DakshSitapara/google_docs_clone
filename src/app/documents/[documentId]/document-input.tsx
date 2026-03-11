@@ -1,21 +1,18 @@
-
-import { useState, useRef } from 'react';
-import { BsCloudCheck, BsCloudSlash } from 'react-icons/bs'
-import { useMutation } from 'convex/react';
-import { Id } from '../../../../convex/_generated/dataModel';
-import { api } from '../../../../convex/_generated/api';
-import { useDebounce } from '@/hooks/use-debounce';
-import { toast } from 'sonner';
-import { useStatus } from '@liveblocks/react';
-import { LoaderIcon } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import { BsCloudCheck, BsCloudSlash } from "react-icons/bs";
+import { useMutation } from "convex/react";
+import { Id } from "../../../../convex/_generated/dataModel";
+import { api } from "../../../../convex/_generated/api";
+import { useDebounce } from "@/hooks/use-debounce";
+import { toast } from "sonner";
+import { useStatus } from "@liveblocks/react";
+import { LoaderIcon } from "lucide-react";
 
 interface DocumentInputProps {
   title: string;
-  id: Id<"documents">
-
+  id: Id<"documents">;
 }
-export const DocumentInput = ({title, id} : DocumentInputProps) => {
-
+export const DocumentInput = ({ title, id }: DocumentInputProps) => {
   const status = useStatus();
 
   const [value, setValue] = useState(title);
@@ -42,11 +39,11 @@ export const DocumentInput = ({title, id} : DocumentInputProps) => {
       });
   });
 
-  const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
     debouncedUpdate(newValue);
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,19 +60,26 @@ export const DocumentInput = ({title, id} : DocumentInputProps) => {
       .finally(() => {
         setIsPending(false);
       });
-  }
+  };
 
-  const showLoader = isPending || status === "connecting" || status === "reconnecting";
-  const showError = status === "disconnected"; 
+  const showLoader =
+    isPending || status === "connecting" || status === "reconnecting";
+  const showError = status === "disconnected";
+
+  useEffect(() => {
+    setValue(title);
+  }, [title]);
+
+  useEffect(() => {
+    const currentTitle = value || "Untitled document";
+    window.document.title = `${currentTitle} - Google Docs Clone`;
+  }, [value, title]);
 
   return (
     <div className="flex items-center gap-2">
       {isEditing ? (
-        <form 
-            onSubmit={handleSubmit} 
-            className='relative w-fit max-w-[50ch]'
-        >
-          <span className='px-1.5 text-lg whitespace-pre invisible'>
+        <form onSubmit={handleSubmit} className="relative w-fit max-w-[50ch]">
+          <span className="px-1.5 text-lg whitespace-pre invisible">
             {value || ""}
           </span>
           <input
@@ -87,22 +91,26 @@ export const DocumentInput = ({title, id} : DocumentInputProps) => {
             className="absolute inset-0 text-lg px-1.5 text-black bg-transparent truncate"
           />
         </form>
-      ): (
+      ) : (
         <span
           onClick={() => {
             setIsEditing(true);
             setTimeout(() => {
               inputRef.current?.focus();
             }, 0);
-          }} 
-          className='text-lg px-1.5 cursor-pointer truncate'
+          }}
+          className="text-lg px-1.5 cursor-pointer truncate"
         >
           {title}
         </span>
       )}
-      {showError && <BsCloudSlash className='size-4 text-red-500' />}
-      {!showLoader && !showError && <BsCloudCheck className=' size-4 text-green-500' />}
-      {showLoader && <LoaderIcon className='size-4 animate-spin text-muted-foreground' />}
+      {showError && <BsCloudSlash className="size-4 text-red-500" />}
+      {!showLoader && !showError && (
+        <BsCloudCheck className=" size-4 text-green-500" />
+      )}
+      {showLoader && (
+        <LoaderIcon className="size-4 animate-spin text-muted-foreground" />
+      )}
     </div>
   );
 };
