@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Image from "@tiptap/extension-image";
-import ImageRezize from "tiptap-extension-resize-image";
+import ImageResize from "tiptap-extension-resize-image";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
@@ -82,7 +82,7 @@ export const Editor = ( { initialContent }: EditorProps) => {
       }),
       Youtube,
       Image,
-      ImageRezize,
+      ImageResize,
       Table,
       TableRow,
       TableHeader,

@@ -8,6 +8,7 @@ import { DocumentMenu } from "./document-menu";
 import { useRouter } from "next/navigation";
 import { DocumentPreviewCard } from "./document-preview-card";
 import { useEffect, useRef, useState } from "react";
+import { DocumentPreviewSkeleton } from "./document-preview-skeleton";
 
 interface DocumentCardProps {
   document: Doc<"documents">;
@@ -19,17 +20,25 @@ export const DocumentCard = ({ document }: DocumentCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
+          timer = setTimeout(() => {
+            setIsVisible(true);
+            observer.disconnect();
+          }, 100);
+        } else {
+          clearTimeout(timer);
         }
       },
-      { threshold: 0.05 },
+      { threshold: 0.1, rootMargin: "50px" },
     );
     if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -38,34 +47,18 @@ export const DocumentCard = ({ document }: DocumentCardProps) => {
       className="group cursor-pointer"
       onClick={() => router.push(`/documents/${document._id}`)}
     >
-      <div
-        className="
-          flex flex-col rounded-[4px] overflow-hidden
-          border
-          transition-shadow duration-200
-          group-hover:border-blue-500
-        "
-      >
+      <div className="flex flex-col rounded-[4px] overflow-hidden border group-hover:border-blue-500">
         <div
           className="relative bg-white overflow-hidden"
           style={{ height: 256 }}
         >
-          {isVisible ? (
-            <div className="absolute inset-0">
+          <div className="absolute inset-0">
+            {isVisible ? (
               <DocumentPreviewCard content={document.initialContent ?? ""} />
-            </div>
-          ) : (
-            <div className="absolute inset-0 bg-white p-5 space-y-[7px]">
-              <div className="h-[10px] bg-[#f1f3f4] rounded-sm w-2/3 animate-pulse" />
-              <div className="h-[7px] bg-[#f1f3f4] rounded-sm w-full animate-pulse" />
-              <div className="h-[7px] bg-[#f1f3f4] rounded-sm w-5/6 animate-pulse" />
-              <div className="h-[7px] bg-[#f1f3f4] rounded-sm w-full animate-pulse" />
-              <div className="h-[7px] bg-transparent w-full" />
-              <div className="h-[7px] bg-[#f1f3f4] rounded-sm w-4/5 animate-pulse" />
-              <div className="h-[7px] bg-[#f1f3f4] rounded-sm w-full animate-pulse" />
-              <div className="h-[7px] bg-[#f1f3f4] rounded-sm w-3/4 animate-pulse" />
-            </div>
-          )}
+            ) : (
+              <DocumentPreviewSkeleton />
+            )}
+          </div>
 
           <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-white/90 to-transparent pointer-events-none" />
         </div>

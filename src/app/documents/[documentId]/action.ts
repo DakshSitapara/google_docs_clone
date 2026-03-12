@@ -11,9 +11,8 @@ export async function getDocument(ids: Id<"documents">[]) {
     return await convex.query(api.documents.getByIds, { ids });
 }
 
-export  async function getUsers() {
-
-    const { sessionClaims } = await auth();
+export async function getUsers() {
+    const { sessionClaims, userId } = await auth();
     const clerk = await clerkClient();
 
     let organizationId: string | undefined = undefined;
@@ -21,19 +20,24 @@ export  async function getUsers() {
         organizationId = (sessionClaims.o as { id: string }).id;
     }
 
-    const response = await clerk.users.getUserList({
-        organizationId: organizationId ? [organizationId] : [],
-    });
-
-    const users = response.data.map((user) => {
-        return {
+    if (organizationId) {
+        const response = await clerk.users.getUserList({
+            organizationId: [organizationId],
+        });
+        return response.data.map((user) => ({
             id: user.id,
             name: user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Anonymous",
             avatar: user.imageUrl,
             color: "",
-        };
-    })
+        }));
+    }
 
-    return users;
-
+    if (!userId) return [];
+    const user = await clerk.users.getUser(userId);
+    return [{
+        id: user.id,
+        name: user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Anonymous",
+        avatar: user.imageUrl,
+        color: "",
+    }];
 }
