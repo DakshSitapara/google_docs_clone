@@ -25,7 +25,10 @@ export const Document = ({ preloadedDocument }: DocumentProps) => {
         <div className="pt-[114px] print:pt-0">
           <div className="print:block">
             <ScrollArea className="h-[calc(100vh-114px)] print:h-auto print:overflow-visible">
-              <Editor initialContent={document.initialContent} />
+              <Editor
+                documentId={document._id}
+                initialContent={document.initialContent}
+              />
               <ScrollBar orientation="horizontal" className="print:hidden" />
             </ScrollArea>
           </div>

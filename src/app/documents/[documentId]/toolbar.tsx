@@ -7,6 +7,10 @@ import { type ColorResult, SketchPicker } from "react-color";
 import { type Level } from "@tiptap/extension-heading";
 import { useEditorStore } from "@/store/use-editor-store";
 import {
+  BubbleMenu as TiptapBubbleMenu,
+  FloatingMenu as TiptapFloatingMenu,
+} from "@tiptap/react/menus";
+import {
   BoldIcon,
   ChevronDownIcon,
   ItalicIcon,
@@ -864,5 +868,186 @@ export const Toolbar = () => {
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
       <AddYoutubeVideo />
     </div>
+  );
+};
+
+export const BubbleMenuBar = () => {
+  const { export: editor } = useEditorStore();
+
+  if (!editor) return null;
+
+  const section: {
+    label: string;
+    icon: LucideIcon;
+    onClick: () => void;
+    isActive?: boolean;
+  }[][] = [
+    [
+      {
+        label: "Spell Check",
+        icon: SpellCheck,
+        onClick: () => {
+          const current = editor?.view.dom.getAttribute("spellcheck");
+          editor?.view.dom.setAttribute(
+            "spellcheck",
+            current === "false" ? "true" : "false",
+          );
+        },
+      },
+    ],
+    [
+      {
+        label: "Bold",
+        icon: BoldIcon,
+        isActive: editor?.isActive("bold"),
+        onClick: () => editor?.chain().focus().toggleBold().run(),
+      },
+      {
+        label: "Italic",
+        icon: ItalicIcon,
+        isActive: editor?.isActive("italic"),
+        onClick: () => editor?.chain().focus().toggleItalic().run(),
+      },
+      {
+        label: "Underline",
+        icon: UnderlineIcon,
+        isActive: editor?.isActive("underline"),
+        onClick: () => editor?.chain().focus().toggleUnderline().run(),
+      },
+    ],
+    [
+      {
+        label: "Comment",
+        icon: MessageSquarePlusIcon,
+        onClick: () => editor?.chain().focus().addPendingComment().run(),
+        isActive: editor?.isActive("liveblockComment"),
+      },
+      {
+        label: "List Todo",
+        icon: ListTodoIcon,
+        onClick: () => editor?.chain().focus().toggleTaskList().run(),
+        isActive: editor?.isActive("taskList"),
+      },
+      {
+        label: "Remove Formatting",
+        icon: RemoveFormattingIcon,
+        onClick: () => editor?.chain().focus().unsetAllMarks().run(),
+      },
+    ],
+  ];
+
+  return (
+    <TiptapBubbleMenu editor={editor}>
+      <div
+        onMouseDown={(e) => e.preventDefault()}
+        className="bg-[#F1F4F9] px-2,5 py-0.5 rounded-lg shadow-lg min-h-[40px] flex items-center overflow-x-auto gap-x-0.5 border border-neutral-200"
+      >
+        {section[0].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <FontFamilyButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <HeadingLevelButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <FontSizeButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        {section[1].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <TextColorButton />
+        <HighlightColorButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <LinkButton />
+        <ImageButton />
+        <AlignButton />
+        <LineHeightButton />
+        <ListButton />
+        {section[2].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+      </div>
+    </TiptapBubbleMenu>
+  );
+};
+
+export const FloatingMenuBar = () => {
+  const { export: editor } = useEditorStore();
+
+  if (!editor) return null;
+
+  const section: {
+    label: string;
+    icon: LucideIcon;
+    onClick: () => void;
+    isActive?: boolean;
+  }[][] = [
+    [
+      {
+        label: "Bold",
+        icon: BoldIcon,
+        isActive: editor?.isActive("bold"),
+        onClick: () => editor?.chain().focus().toggleBold().run(),
+      },
+      {
+        label: "Italic",
+        icon: ItalicIcon,
+        isActive: editor?.isActive("italic"),
+        onClick: () => editor?.chain().focus().toggleItalic().run(),
+      },
+      {
+        label: "Underline",
+        icon: UnderlineIcon,
+        isActive: editor?.isActive("underline"),
+        onClick: () => editor?.chain().focus().toggleUnderline().run(),
+      },
+    ],
+    [
+      {
+        label: "Comment",
+        icon: MessageSquarePlusIcon,
+        onClick: () => editor?.chain().focus().addPendingComment().run(),
+        isActive: editor?.isActive("liveblockComment"),
+      },
+      {
+        label: "List Todo",
+        icon: ListTodoIcon,
+        onClick: () => editor?.chain().focus().toggleTaskList().run(),
+        isActive: editor?.isActive("taskList"),
+      },
+      {
+        label: "Remove Formatting",
+        icon: RemoveFormattingIcon,
+        onClick: () => editor?.chain().focus().unsetAllMarks().run(),
+      },
+    ],
+  ];
+
+  return (
+    <TiptapFloatingMenu editor={editor}>
+      <div className="bg-[#F1F4F9] px-2,5 py-0.5 rounded-lg shadow-lg min-h-[40px] flex items-center overflow-x-auto gap-x-0.5 border border-neutral-200">
+        <FontFamilyButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <HeadingLevelButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <FontSizeButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        {section[0].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <TextColorButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <LinkButton />
+        <ImageButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        {section[1].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <AddButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <AddYoutubeVideo />
+      </div>
+    </TiptapFloatingMenu>
   );
 };

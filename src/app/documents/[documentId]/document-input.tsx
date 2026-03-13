@@ -7,64 +7,56 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import { useStatus } from "@liveblocks/react";
 import { LoaderIcon } from "lucide-react";
+import { useEditorStore } from "@/store/use-editor-store";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { formatDistanceToNow } from "date-fns";
 
 interface DocumentInputProps {
   title: string;
   id: Id<"documents">;
+  updatedAt?: number;
 }
-export const DocumentInput = ({ title, id }: DocumentInputProps) => {
+
+export const DocumentInput = ({ title, id, updatedAt }: DocumentInputProps) => {
   const status = useStatus();
+  const { saveStatus } = useEditorStore();
 
   const [value, setValue] = useState(title);
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
-
   const mutate = useMutation(api.documents.updateById);
 
   const debouncedUpdate = useDebounce((newValue: string) => {
     if (newValue === title) return;
-
     setIsPending(true);
     mutate({ id, title: newValue })
-      .then(() => {
-        toast.success("Document title updated");
-      })
-      .catch(() => {
-        toast.error("Something went wrong");
-      })
-      .finally(() => {
-        setIsPending(false);
-      });
+      .then(() => toast.success("Document title updated"))
+      .catch(() => toast.error("Something went wrong"))
+      .finally(() => setIsPending(false));
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-    debouncedUpdate(newValue);
+    setValue(e.target.value);
+    debouncedUpdate(e.target.value);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setIsPending(true);
     mutate({ id, title: value })
       .then(() => {
         toast.success("Document title updated");
         setIsEditing(false);
       })
-      .catch(() => {
-        toast.error("Something went wrong");
-      })
-      .finally(() => {
-        setIsPending(false);
-      });
+      .catch(() => toast.error("Something went wrong"))
+      .finally(() => setIsPending(false));
   };
-
-  const showLoader =
-    isPending || status === "connecting" || status === "reconnecting";
-  const showError = status === "disconnected";
 
   useEffect(() => {
     setValue(title);
@@ -74,6 +66,26 @@ export const DocumentInput = ({ title, id }: DocumentInputProps) => {
     const currentTitle = value || "Untitled document";
     window.document.title = `${currentTitle} - Google Docs Clone`;
   }, [value, title]);
+
+  const showLoader =
+    isPending ||
+    status === "connecting" ||
+    status === "reconnecting" ||
+    saveStatus === "saving";
+
+  const showError = status === "disconnected";
+
+  const lastSavedText = updatedAt
+    ? `Last edited ${formatDistanceToNow(new Date(updatedAt), { addSuffix: true })}`
+    : "Not yet saved";
+
+  const statusText = showError
+    ? "Connection lost — changes may not be saved"
+    : saveStatus === "saving"
+      ? "Saving..."
+      : saveStatus === "unsaved"
+        ? "Unsaved changes"
+        : lastSavedText;
 
   return (
     <div className="flex items-center gap-2">
@@ -95,22 +107,29 @@ export const DocumentInput = ({ title, id }: DocumentInputProps) => {
         <span
           onClick={() => {
             setIsEditing(true);
-            setTimeout(() => {
-              inputRef.current?.focus();
-            }, 0);
+            setTimeout(() => inputRef.current?.focus(), 0);
           }}
           className="text-lg px-1.5 cursor-pointer truncate"
         >
           {title}
         </span>
       )}
-      {showError && <BsCloudSlash className="size-4 text-red-500" />}
-      {!showLoader && !showError && (
-        <BsCloudCheck className=" size-4 text-green-500" />
-      )}
-      {showLoader && (
-        <LoaderIcon className="size-4 animate-spin text-muted-foreground" />
-      )}
+
+      <Tooltip>
+        <TooltipTrigger className="text-muted-foreground">
+          {showError && <BsCloudSlash className="size-4 text-red-500" />}
+          {!showError && showLoader && (
+            <LoaderIcon className="size-4 animate-spin text-muted-foreground" />
+          )}
+          {!showError && !showLoader && saveStatus === "unsaved" && (
+            <BsCloudSlash className="size-4 text-yellow-500" />
+          )}
+          {!showError && !showLoader && saveStatus === "saved" && (
+            <BsCloudCheck className="size-4 text-green-500" />
+          )}
+        </TooltipTrigger>
+        <TooltipContent>{statusText}</TooltipContent>
+      </Tooltip>
     </div>
   );
 };

@@ -1,6 +1,11 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useCallback, useEffect, useRef } from "react";
+import {
+  useEditor,
+  EditorContent,
+  Editor as TiptapEditor,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
@@ -20,18 +25,23 @@ import TextAlign from "@tiptap/extension-text-align";
 import Youtube from "@tiptap/extension-youtube";
 import { useStorage } from "@liveblocks/react/suspense";
 import { useLiveblocksExtension } from "@liveblocks/react-tiptap";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 import { useEditorStore } from "@/store/use-editor-store";
 import { FontSizeExtension } from "@/extensions/font-size";
 import { LineHeightExtension } from "@/extensions/line-height";
 import { ButtonExtension } from "@/extensions/add-button";
 import { Ruler } from "./ruler";
 import { Threads } from "./threads";
+import { BubbleMenuBar, FloatingMenuBar } from "./toolbar";
 
 interface EditorProps {
   initialContent?: string | undefined;
+  documentId: Id<"documents">;
 }
 
-export const Editor = ({ initialContent }: EditorProps) => {
+export const Editor = ({ initialContent, documentId }: EditorProps) => {
   const liveblocks = useLiveblocksExtension({
     initialContent,
     offlineSupport_experimental: true,
@@ -39,18 +49,48 @@ export const Editor = ({ initialContent }: EditorProps) => {
 
   const leftMargin = useStorage((root) => root.leftMargin);
   const rightMargin = useStorage((root) => root.rightMargin);
-  const { setEditor } = useEditorStore();
+  const { setEditor, setSaveStatus } = useEditorStore();
+
+  const updateContent = useMutation(api.documents.updateContent);
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const lastSavedContent = useRef<string>("");
+  const isReady = useRef(false);
+
+  const handleUpdate = useCallback(
+    ({ editor }: { editor: TiptapEditor }) => {
+      if (!isReady.current) return;
+      setEditor(editor);
+      setSaveStatus("unsaved");
+      clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(async () => {
+        const html = editor.getHTML();
+        if (html === "<p></p>" || html === "") return;
+        if (html === lastSavedContent.current) {
+          setSaveStatus("saved");
+          return;
+        }
+        setSaveStatus("saving");
+        await updateContent({ id: documentId, content: html });
+        lastSavedContent.current = html;
+        setSaveStatus("saved");
+      }, 3000);
+    },
+    [documentId, updateContent, setEditor, setSaveStatus],
+  );
 
   const editor = useEditor({
     onCreate({ editor }) {
       setEditor(editor);
+      setTimeout(() => {
+        lastSavedContent.current = editor.getHTML();
+        isReady.current = true;
+      }, 1000);
     },
     onDestroy: () => {
       setEditor(null);
+      isReady.current = false;
     },
-    onUpdate: ({ editor }) => {
-      setEditor(editor);
-    },
+    onUpdate: handleUpdate,
     onSelectionUpdate: ({ editor }) => {
       setEditor(editor);
     },
@@ -90,28 +130,26 @@ export const Editor = ({ initialContent }: EditorProps) => {
       TableRow,
       TableHeader,
       TableCell,
-      TaskItem.configure({
-        nested: true,
-      }),
+      TaskItem.configure({ nested: true }),
       TaskList,
       FontFamily,
       TextStyle,
       Color,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Highlight.configure({
-        multicolor: true,
-      }),
-
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Highlight.configure({ multicolor: true }),
       FontSizeExtension,
       LineHeightExtension,
       ButtonExtension,
     ],
-    // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     autofocus: true,
   });
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(saveTimer.current);
+    };
+  }, []);
 
   return (
     <div className="size-full overflow-x-auto bg-[#F9FBFD] px-4 print:p-0 print:bg-white print:overflow-visible">
@@ -120,6 +158,8 @@ export const Editor = ({ initialContent }: EditorProps) => {
         <EditorContent editor={editor} />
         <Threads editor={editor} />
       </div>
+      <BubbleMenuBar />
+      <FloatingMenuBar />
     </div>
   );
 };

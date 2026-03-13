@@ -54,7 +54,11 @@ export const DocumentCard = ({ document }: DocumentCardProps) => {
         >
           <div className="absolute inset-0">
             {isVisible ? (
-              <DocumentPreviewCard content={document.initialContent ?? ""} />
+              <DocumentPreviewCard
+                content={
+                  document?.latestContent ?? document?.initialContent ?? ""
+                }
+              />
             ) : (
               <DocumentPreviewSkeleton />
             )}
