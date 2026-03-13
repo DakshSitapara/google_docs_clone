@@ -1,20 +1,20 @@
 "use client";
 
-import { EditorContent, useEditor } from "@tiptap/react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Image from "@tiptap/extension-image";
-import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import TableRow from "@tiptap/extension-table-row";
-import Underline from "@tiptap/extension-underline";
+import {
+  Table,
+  TableRow,
+  TableCell,
+  TableHeader,
+} from "@tiptap/extension-table";
 import FontFamily from "@tiptap/extension-font-family";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { Color } from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
-import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import { FontSizeExtension } from "@/extensions/font-size";
 import { LineHeightExtension } from "@/extensions/line-height";
@@ -41,7 +41,9 @@ export const DocumentPreviewCard = ({ content }: DocumentPreviewCardProps) => {
       },
     },
     extensions: [
-      StarterKit.configure({ history: false }),
+      StarterKit.configure({
+        undoRedo: false,
+      }),
       TaskItem.configure({ nested: true }),
       TaskList,
       Image,
@@ -49,17 +51,11 @@ export const DocumentPreviewCard = ({ content }: DocumentPreviewCardProps) => {
       TableRow,
       TableHeader,
       TableCell,
-      Underline,
       FontFamily,
       TextStyle,
       Color,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Highlight.configure({ multicolor: true }),
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        defaultProtocol: "https",
-      }),
       FontSizeExtension,
       LineHeightExtension,
     ],

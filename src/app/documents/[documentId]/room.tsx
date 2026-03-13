@@ -1,7 +1,7 @@
 "use client";
 
-import {  ReactNode, useEffect, useMemo, useState } from "react";
-import { getUsers,getDocument } from "./action";
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import { getUsers, getDocument } from "./action";
 import {
   LiveblocksProvider,
   RoomProvider,
@@ -11,76 +11,84 @@ import { useParams } from "next/navigation";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import { toast } from "sonner";
 import { Id } from "../../../../convex/_generated/dataModel";
+import { LiveCursors } from "@/components/live-cursors";
 
 type User = {
   id: string;
   name: string;
   avatar: string;
   color: string;
-}
+};
 
 export function Room({ children }: { children: ReactNode }) {
+  const param = useParams();
+  const [users, setUsers] = useState<User[]>([]);
 
-    const param = useParams();
-    const [users, setUsers] = useState<User[]>([]);
-    
-    const fetchUsers = useMemo(() => async () => {
-      try{
+  const fetchUsers = useMemo(
+    () => async () => {
+      try {
         const list = await getUsers();
         setUsers(list);
-      }catch{
+      } catch {
         toast.error("Failed to fetch users");
       }
-    }, []);
+    },
+    [],
+  );
 
-    useEffect(() => {
-      fetchUsers();
-    }, [fetchUsers]);
-
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   return (
-    <LiveblocksProvider 
-    throttle={16}
-    authEndpoint={async () => {
-      const endpoint = "/api/liveblock-auth";
-      const room = param.documentId as string;
+    <LiveblocksProvider
+      throttle={16}
+      authEndpoint={async () => {
+        const endpoint = "/api/liveblock-auth";
+        const room = param.documentId as string;
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: JSON.stringify({ room }),
-      });
+        const response = await fetch(endpoint, {
+          method: "POST",
+          body: JSON.stringify({ room }),
+        });
 
-      return await response.json();
-    }}
-    resolveUsers={({ userIds }) => {
-      return userIds.map((userIds) => users.find((user) => user.id === userIds) ?? undefined);
-    }}
-    resolveMentionSuggestions={ ({ text }) => {
-      let filteredUsers = users;
-
-      if (text) {
-        filteredUsers = filteredUsers.filter((user) =>
-          user.name.toLowerCase().includes(text.toLowerCase())
+        return await response.json();
+      }}
+      resolveUsers={({ userIds }) => {
+        return userIds.map(
+          (userIds) => users.find((user) => user.id === userIds) ?? undefined,
         );
-      }
-      return filteredUsers.map((user) => user.id); 
-    }
+      }}
+      resolveMentionSuggestions={({ text }) => {
+        let filteredUsers = users;
 
-    }
-    resolveRoomsInfo={async ({ roomIds }) =>{
-      const documents = await getDocument(roomIds as Id<"documents">[]);
-      return documents.map((document) => ({ id: document.id, name: document.name }));
-    }}
+        if (text) {
+          filteredUsers = filteredUsers.filter((user) =>
+            user.name.toLowerCase().includes(text.toLowerCase()),
+          );
+        }
+        return filteredUsers.map((user) => user.id);
+      }}
+      resolveRoomsInfo={async ({ roomIds }) => {
+        const documents = await getDocument(roomIds as Id<"documents">[]);
+        return documents.map((document) => ({
+          id: document.id,
+          name: document.name,
+        }));
+      }}
     >
-      <RoomProvider 
-         id={param.documentId as string}
-         initialStorage={{
-           leftMargin: 56,
-           rightMargin: 56,
-         }}
-         >
-        <ClientSideSuspense fallback={<FullscreenLoader label="Loading Room..." />}>
-          {children}
+      <RoomProvider
+        id={param.documentId as string}
+        initialPresence={{ cursor: null }}
+        initialStorage={{
+          leftMargin: 56,
+          rightMargin: 56,
+        }}
+      >
+        <ClientSideSuspense
+          fallback={<FullscreenLoader label="Loading Room..." />}
+        >
+          <LiveCursors>{children}</LiveCursors>
         </ClientSideSuspense>
       </RoomProvider>
     </LiveblocksProvider>
