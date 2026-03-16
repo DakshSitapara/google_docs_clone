@@ -35,6 +35,7 @@ import { ButtonExtension } from "@/extensions/add-button";
 import { Ruler } from "./ruler";
 import { Threads } from "./threads";
 import { BubbleMenuBar, FloatingMenuBar } from "./toolbar";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface EditorProps {
   initialContent?: string | undefined;
@@ -152,12 +153,17 @@ export const Editor = ({ initialContent, documentId }: EditorProps) => {
   }, []);
 
   return (
-    <div className="size-full overflow-x-auto bg-[#F9FBFD] px-4 print:p-0 print:bg-white print:overflow-visible">
-      <Ruler />
-      <div className="min-w-max flex justify-center w-[816px] py-4 print:py-0 mx-auto print:w-full print:min-w-0">
-        <EditorContent editor={editor} />
-        <Threads editor={editor} />
+    <div className="flex flex-col h-full bg-[#F9FBFD] print:p-0 print:bg-white print:overflow-visible">
+      <div className="px-4 flex-shrink-0 print:hidden">
+        <Ruler />
       </div>
+      <ScrollArea className="flex-1 print:h-auto print:overflow-visible">
+        <div className="min-w-max flex justify-center w-[816px] py-4 print:py-0 mx-auto print:w-full print:min-w-0">
+          <EditorContent editor={editor} />
+          <ScrollBar orientation="horizontal" className="print:hidden" />
+          <Threads editor={editor} />
+        </div>
+      </ScrollArea>
       <BubbleMenuBar />
       <FloatingMenuBar />
     </div>
