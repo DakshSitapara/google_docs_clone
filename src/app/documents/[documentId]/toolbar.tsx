@@ -6,10 +6,7 @@ import { cn } from "@/lib/utils";
 import { type ColorResult, SketchPicker } from "react-color";
 import { type Level } from "@tiptap/extension-heading";
 import { useEditorStore } from "@/store/use-editor-store";
-import {
-  BubbleMenu as TiptapBubbleMenu,
-  FloatingMenu as TiptapFloatingMenu,
-} from "@tiptap/react/menus";
+import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus";
 import {
   BoldIcon,
   ChevronDownIcon,
@@ -65,7 +62,7 @@ import {
 import { SiYoutubekids } from "react-icons/si";
 
 const AddYoutubeVideo = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
   const [url, setUrl] = useState("");
   const handleAddYoutubeVideo = () => {
     if (!editor) return;
@@ -109,7 +106,7 @@ const AddYoutubeVideo = () => {
 };
 
 const AddButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const [text, setText] = useState("");
   const [href, setHref] = useState("");
@@ -251,7 +248,7 @@ const AddButton = () => {
 };
 
 const LineHeightButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const lineHeights = [
     { label: "Default", value: "normal" },
@@ -288,7 +285,7 @@ const LineHeightButton = () => {
 };
 
 const FontSizeButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const currentFontSize = editor?.getAttributes("textStyle").fontSize
     ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
@@ -375,7 +372,7 @@ const FontSizeButton = () => {
 };
 
 const ListButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const lists = [
     {
@@ -419,7 +416,7 @@ const ListButton = () => {
 };
 
 const AlignButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const alignments = [
     {
@@ -471,7 +468,7 @@ const AlignButton = () => {
 };
 
 const ImageButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -549,7 +546,7 @@ const ImageButton = () => {
 };
 
 const LinkButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const [value, setValue] = useState("");
 
@@ -589,7 +586,7 @@ const LinkButton = () => {
 };
 
 const HighlightColorButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const value = editor?.getAttributes("highlight").color || "#FFFF00";
 
@@ -612,7 +609,7 @@ const HighlightColorButton = () => {
 };
 
 const TextColorButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const value = editor?.getAttributes("textStyle").color || "#000000";
 
@@ -636,7 +633,7 @@ const TextColorButton = () => {
 };
 
 const HeadingLevelButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const headings = [
     { label: "Normal text", value: 0, fontSize: "16px" },
@@ -697,7 +694,7 @@ const HeadingLevelButton = () => {
 };
 
 const FontFamilyButton = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   const fonts = [
     { label: "Arial", value: "Arial" },
@@ -762,7 +759,7 @@ const ToolbarButton = ({
 };
 
 export const Toolbar = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
   const section: {
     label: string;
     icon: LucideIcon;
@@ -838,7 +835,7 @@ export const Toolbar = () => {
     ],
   ];
   return (
-    <div className="bg-[#F1F4F9] px-2,5 py-0.5 rounded-[24px] min-h-[40px] flex items-center gap-x-0.5 overflow-x-auto">
+    <div className="bg-[#F1F4F9] px-2.5 py-0.5 rounded-[24px] min-h-[40px] flex items-center gap-x-0.5 overflow-x-auto">
       {section[0].map((item) => (
         <ToolbarButton key={item.label} {...item} />
       ))}
@@ -872,7 +869,7 @@ export const Toolbar = () => {
 };
 
 export const BubbleMenuBar = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   if (!editor) return null;
 
@@ -937,10 +934,10 @@ export const BubbleMenuBar = () => {
   ];
 
   return (
-    <TiptapBubbleMenu editor={editor}>
+    <BubbleMenu editor={editor}>
       <div
         onMouseDown={(e) => e.preventDefault()}
-        className="bg-[#F1F4F9] px-2,5 py-0.5 rounded-lg shadow-lg min-h-[40px] flex items-center overflow-x-auto gap-x-0.5 border border-neutral-200"
+        className="bg-[#F1F4F9] px-2.5 py-0.5 rounded-lg shadow-lg min-h-[40px] flex items-center overflow-x-auto gap-x-0.5 border border-neutral-200"
       >
         {section[0].map((item) => (
           <ToolbarButton key={item.label} {...item} />
@@ -967,12 +964,12 @@ export const BubbleMenuBar = () => {
           <ToolbarButton key={item.label} {...item} />
         ))}
       </div>
-    </TiptapBubbleMenu>
+    </BubbleMenu>
   );
 };
 
 export const FloatingMenuBar = () => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
 
   if (!editor) return null;
 
@@ -1024,8 +1021,11 @@ export const FloatingMenuBar = () => {
   ];
 
   return (
-    <TiptapFloatingMenu editor={editor}>
-      <div className="bg-[#F1F4F9] px-2,5 py-0.5 rounded-lg shadow-lg min-h-[40px] flex items-center overflow-x-auto gap-x-0.5 border border-neutral-200">
+    <FloatingMenu editor={editor}>
+      <div
+        onMouseDown={(e) => e.preventDefault()}
+        className="bg-[#F1F4F9] px-2.5 py-0.5 rounded-lg shadow-lg min-h-[40px] flex items-center overflow-x-auto gap-x-0.5 border border-neutral-200"
+      >
         <FontFamilyButton />
         <Separator orientation="vertical" className="h-6 bg-neutral-300" />
         <HeadingLevelButton />
@@ -1048,6 +1048,6 @@ export const FloatingMenuBar = () => {
         <Separator orientation="vertical" className="h-6 bg-neutral-300" />
         <AddYoutubeVideo />
       </div>
-    </TiptapFloatingMenu>
+    </FloatingMenu>
   );
 };

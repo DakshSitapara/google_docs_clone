@@ -52,7 +52,7 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ data }: NavbarProps) => {
-  const { export: editor } = useEditorStore();
+  const { editor } = useEditorStore();
   const router = useRouter();
   const mutation = useMutation(api.documents.create);
 
